@@ -4,14 +4,14 @@ namespace TaskManagement.Application.Services
 {
     public interface ITaskService
     {
-        Task<TaskResponse> CreateTaskAsync(TaskDTO taskDTO);     
+        Task<TaskResponse> CreateTaskAsync(TaskDTO taskDTO, string userId);     
 
-        Task<TaskResponse> ReadTaskAsync(Guid id);
+        Task<TaskResponse> ReadTaskAsync(Guid id, string userId);
 
-        Task<TasksResponse> ReadAllTasksAsync();
+        Task<TasksResponse> ReadAllTasksAsync(string userId);
 
-        Task<TaskResponse> UpdateTaskAsync(Guid id, TaskDTO taskDTO);
+        Task<TaskResponse> UpdateTaskAsync(Guid id, TaskDTO taskDTO, string userId);
 
-        Task<TaskResponse> DeleteTaskAsync(Guid id);        
+        Task<TaskResponse> DeleteTaskAsync(Guid id, string userId);        
     }
 }

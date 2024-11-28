@@ -33,8 +33,21 @@ namespace TaskManagement.Infrastructure.DependencyInjection
             {
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,                    
                     ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),                    
+                };
+
+                options.Events = new JwtBearerEvents()
+                {
+                    OnMessageReceived = context => 
+                    {
+                        context.Token = context.Request.Cookies[jwtOptions.CookieName];
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

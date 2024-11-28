@@ -1,20 +1,24 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Repositories;
 using TaskManagement.Application.Services;
+using TaskManagement.Infrastructure.Authentication;
 
 namespace TaskManagement.API.Controllers
 {
-    [Route("api/[controller]s")]
+    [Route("users")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly JwtOptions _options;
 
-        public UserController(IUserService userService) 
+        public UserController(IUserService userService, IOptions<JwtOptions> options) 
         {
             _userService = userService;
+            _options = options.Value;
         }
 
         [HttpPost]
@@ -25,6 +29,7 @@ namespace TaskManagement.API.Controllers
 
             if (response.IsSuccess)
             {
+                HttpContext.Response.Cookies.Append(_options.CookieName, response.Token);
                 return Ok(response);
             }
 

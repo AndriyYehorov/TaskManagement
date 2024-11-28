@@ -77,7 +77,7 @@ namespace TaskManagement.Infrastructure.Services
 
             var token = new JwtSecurityToken(
                 claims: userClaims,
-                expires: DateTime.UtcNow.AddHours(_options.ExpiredHours),
+                expires: DateTime.UtcNow.AddHours(_options.ExpiredHours),                
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
