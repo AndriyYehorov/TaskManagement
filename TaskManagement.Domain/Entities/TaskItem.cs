@@ -3,7 +3,7 @@ using TaskManagement.Domain.Enums;
 
 namespace TaskManagement.Domain.Entities
 {
-    public class Task
+    public class TaskItem
     {
         public Guid Id { get; set; }
 

@@ -4,8 +4,8 @@ namespace TaskManagement.Application.Services
 {
     public interface IUserService
     {
-        public Task<UserResponse> RegisterUserAsync(UserDTO userDTO);
+        Task<UserResponse> RegisterUserAsync(UserDTO userDTO);
 
-        public Task<LoginResponse> LoginUserAsync(LoginDTO loginDTO);
+        Task<LoginResponse> LoginUserAsync(LoginDTO loginDTO);
     }
 }
