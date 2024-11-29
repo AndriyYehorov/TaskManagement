@@ -61,9 +61,21 @@ namespace TaskManagement.Infrastructure.Services
             }
         }
 
-        public async Task<TasksResponse> ReadAllTasksAsync(string userId)
+        public async Task<TasksResponse> ReadAllTasksAsync(
+            TaskFilter? filter,
+            string? sortColumn,
+            string? sortOrder, 
+            int page, 
+            int pageSize, 
+            string userId)
         {
-            var tasks = await _taskRepository.GetAllTasksAsync(new Guid(userId));
+            var tasks = await _taskRepository.GetAllTasksAsync(
+                filter,
+                sortColumn, 
+                sortOrder, 
+                page, 
+                pageSize, 
+                new Guid(userId));
 
             if (!tasks.Any())
             {

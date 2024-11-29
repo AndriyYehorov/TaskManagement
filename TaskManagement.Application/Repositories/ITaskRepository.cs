@@ -1,4 +1,5 @@
-﻿using TaskManagement.Domain.Entities;
+﻿using TaskManagement.Application.DTOs;
+using TaskManagement.Domain.Entities;
 
 namespace TaskManagement.Application.Repositories
 {
@@ -6,7 +7,13 @@ namespace TaskManagement.Application.Repositories
     {
         Task<TaskItem?> GetTaskAsync(Guid taskId);
 
-        Task<IEnumerable<TaskItem>> GetAllTasksAsync(Guid userId);
+        Task<IEnumerable<TaskItem>> GetAllTasksAsync(
+            TaskFilter? filter,
+            string? sortColumn, 
+            string? sortOrder, 
+            int page, 
+            int pageSize, 
+            Guid userId);
 
         Task AddTaskAsync(TaskItem task);
 

@@ -21,9 +21,20 @@ namespace TaskManagement.API.Controllers
         }        
 
         [HttpGet]        
-        public async Task<IActionResult> GetAllTasksAsync()
+        public async Task<IActionResult> GetAllTasksAsync(
+            [FromQuery] TaskFilter? filter,
+            string? sortColumn, 
+            string? sortOrder, 
+            int page = 1, 
+            int pageSize = 5)
         {         
-            var response = await _taskService.ReadAllTasksAsync(GetUserId());
+            var response = await _taskService.ReadAllTasksAsync(
+                filter,
+                sortColumn, 
+                sortOrder, 
+                page, 
+                pageSize, 
+                GetUserId());
 
             if (!response.IsSuccess)
             {                

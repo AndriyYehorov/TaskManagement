@@ -11,6 +11,8 @@ namespace TaskManagement.Application.DTOs
         public string Email { get; set; }
 
         [Required]
+        [MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+        [RegularExpression(@"^.*([\W_]).*$", ErrorMessage = "Password must contain at least one special character.")]
         public string Password { get; set; }
     }
 }

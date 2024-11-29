@@ -8,7 +8,13 @@ namespace TaskManagement.Application.Services
 
         Task<TaskResponse> ReadTaskAsync(string id, string userId);
 
-        Task<TasksResponse> ReadAllTasksAsync(string userId);
+        Task<TasksResponse> ReadAllTasksAsync(
+            TaskFilter? filter,
+            string? sortColumn, 
+            string? sortOrder, 
+            int page, 
+            int pageSize, 
+            string userId);
 
         Task<TaskResponse> UpdateTaskAsync(string id, TaskDTO taskDTO, string userId);
 
