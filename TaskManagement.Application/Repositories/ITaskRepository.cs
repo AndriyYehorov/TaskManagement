@@ -4,9 +4,9 @@ namespace TaskManagement.Application.Repositories
 {
     public interface ITaskRepository
     {
-        Task<TaskItem?> GetTaskAsync(Guid id);
+        Task<TaskItem?> GetTaskAsync(Guid taskId);
 
-        Task<IEnumerable<TaskItem>> GetAllTasksAsync();
+        Task<IEnumerable<TaskItem>> GetAllTasksAsync(Guid userId);
 
         Task AddTaskAsync(TaskItem task);
 

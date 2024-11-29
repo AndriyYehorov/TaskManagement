@@ -6,12 +6,12 @@ namespace TaskManagement.Application.Services
     {
         Task<TaskResponse> CreateTaskAsync(TaskDTO taskDTO, string userId);     
 
-        Task<TaskResponse> ReadTaskAsync(Guid id, string userId);
+        Task<TaskResponse> ReadTaskAsync(string id, string userId);
 
         Task<TasksResponse> ReadAllTasksAsync(string userId);
 
-        Task<TaskResponse> UpdateTaskAsync(Guid id, TaskDTO taskDTO, string userId);
+        Task<TaskResponse> UpdateTaskAsync(string id, TaskDTO taskDTO, string userId);
 
-        Task<TaskResponse> DeleteTaskAsync(Guid id, string userId);        
+        Task<TaskResponse> DeleteTaskAsync(string id, string userId);        
     }
 }
