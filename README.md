@@ -1,92 +1,108 @@
-Setup instructions
+# Task Management API
 
-1) Without Docker : 
+Task Management API is a project for managing tasks with features like user authentication, task creation, and filtering.
 
-- Download project files, MS SQL, .NET SDK
+---
 
-- Replace connection string
-in `TaskManagement\TaskManagement.API\appsettings.json `
-ConnectionString -> "DefaultDb" : "<YourConnectionString>"
+## 🚀 Setup Instructions
 
-- Choose TaskManagement.API as startup project
+### Without Docker
+1. **Download the project files**.
+2. **Install prerequisites:**
+   - Microsoft SQL Server
+   - .NET SDK
+3. **Configure the connection string:**
+   - Open `TaskManagement\TaskManagement.API\appsettings.json`.
+   - Set `"DefaultDb"` in the `ConnectionString` section.
+     ```json
+     "ConnectionStrings": {
+         "DefaultDb": "<Your Connection String>"
+     }
+     ```
+4. **Set up the startup project:**
+   - Choose `TaskManagement.API` as the startup project.
+5. **Run the project.**
 
-- Run
+---
 
-2) With Docker:
+### With Docker
+1. **Download the project files**.
+2. **Install Docker.**
+3. **Configure the connection string:**
+   - Open `TaskManagement\TaskManagement.Infrastructure\DependencyInjection\DependencyInjection.cs`.
+   - Change the connection string in line 22 from `"DefaultDb"` to `"DockerDb"`.
+4. **Build and run the project:**
+   - Execute the following command in the `TaskManagement` folder:
+     ```bash
+     docker compose up --build
+     ```
+5. **Wait for the application to launch.**
+   - The app will be available at: [http://localhost:8080/swagger](http://localhost:8080/swagger).
 
-- Download project files, Docker
+---
 
-- Change connection string
-in `TaskManagement\TaskManagement.Infrastructure\DependencyInjection\DependencyInjection.cs`
-line 22 from `"DefaultDb"` to `"DockerDb"`
+## 📖 API Documentation
+#### `POST /users/login`
+Authenticates the user and returns a JWT (also sets the JWT in cookies).  
 
-- run `docker compose up --build` in TaskManagement folder
-
-- wait for lauching, app will be available at `http://localhost:8080/swagger`
-
-API documentation
-
-- POST /users/login
-  
-Authenticates user and returns a JWT.
-(Also writes JWT in Cookies)
-
-Request body :
+**Request Body:**
+```json
 {
-  "usernameOrEmail": "string",
-  "password": "string"
+    "usernameOrEmail": "string",
+    "password": "string"
 }
+```
+#### `POST /users/register`
+Registrates new user. Password must be at least 6 characters long. Password must contain at least one special character.
 
-- POST /users/register
-
-Registrates new user.
-Password must be at least 6 characters long.
-Password must contain at least one special character.
-
+**Request Body:**
+```json
 {
   "username": "string",
   "email": "user@example.com",
-  "password": "string"
+  "password": "str!ng"
 }
+```
 
-- GET /tasks
+#### `GET /tasks`
+Returns tasks with filtering, sorting, and pagination options.
 
-Returns tasks by filters with sorting and pagination options.
+Query Parameters:
 
-page - page number, default is 1
-pageSize - size of page, default is 5
-sortOrder - asc or desc, default is asc
-sortColumn - duedate or priority, , default is id
-MinDueDate - filter by minimun duedate
-MaxDueDate - filter by maximum duedate
-Priority - filter by priority value
-Status - filter by status value
+| Parameter  | Type	 |Default | Description |
+| ------------- | ------------- | ------------- | ---------------------------------------------------- |		
+|page           |int            |1              |Page number                                           |
+|pageSize       |int            |5              |Number of items per page                              |
+|sortOrder      |string         |asc            |Sorting order: asc or desc.                           |
+|sortColumn     |string         |id             |Column to sort by: duedate, priority.                  |
+|MinDueDate     |string         |               |Filter by minimum due date.                            |
+|MaxDueDate     |string         |               |Filter by maximum due date.                             |
+|Priority       |int            |               |Filter by priority (0=Low, 1=Medium, 2=High).           |
+|Status         |int            |               |Filter by status (0=Pending, 1=InProgress, 2=Completed).|
 
-- POST /tasks
 
+#### `POST /tasks`
 Creates new task.
 
-Status can be 0, 1, 2 or Pending, InProgress, Completed.
-Priority can be 0, 1, 2 or Low, Medium, High.
-Only title is required.
-
-Request body :
+**Request Body:**
+```json
 {
   "title": "string",
-  "description": "string",
-  "dueDate": "2024-11-30T22:00:52.818Z",
-  "status": 0,
-  "priority": 0
+   "description": "string",
+   "dueDate": "2024-11-30T22:00:52.818Z",
+   "status": 0,
+   "priority": 0
 }
-  
-- GET /tasks/{id}
+```
+
+#### `GET /tasks/{id}`
 
 Returns task by ID.
 
-- PUT /tasks/{id}
+#### `PUT /tasks/{id}`
 
 Updates task by ID.
-  
-- DELETE /tasks/{id}
-  
+
+#### `DELETE /tasks/{id}`
+
 Deletes task by ID.
