@@ -4,6 +4,7 @@ using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Enums;
 using TaskManagement.Application.Services;
 using TaskManagement.Infrastructure.Authentication;
+using TaskManagement.Infrastructure.Services;
 
 namespace TaskManagement.API.Controllers
 {
@@ -22,6 +23,9 @@ namespace TaskManagement.API.Controllers
 
         [HttpPost]
         [Route("login")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]        
         public async Task<IActionResult> LoginAsync([FromBody] LoginDTO loginDTO) 
         { 
             var response = await _userService.LoginUserAsync(loginDTO);
@@ -42,6 +46,8 @@ namespace TaskManagement.API.Controllers
 
         [HttpPost]
         [Route("register")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> RegisterAsync([FromBody] UserDTO userDTO) 
         {
             var response = await _userService.RegisterUserAsync(userDTO);

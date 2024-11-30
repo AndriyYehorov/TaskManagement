@@ -17,9 +17,16 @@ namespace TaskManagement.API.Controllers
         public TaskController(ITaskService taskService)
         {
             _taskService = taskService;
-        }        
+        }
 
-        [HttpGet]        
+        /// <summary>
+        /// Get all tasks.
+        /// </summary>        
+        /// <returns>Ok if successful, Not found if tasks are not found.</returns>
+        [HttpGet]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> GetAllTasksAsync(
             [FromQuery] TaskFilter? filter,
             string? sortColumn, 
@@ -43,8 +50,16 @@ namespace TaskManagement.API.Controllers
             };
         }
 
+        /// <summary>
+        /// Get a task by ID.
+        /// </summary>        
+        /// <returns>Ok if successful, Not found if the task is not found.</returns>
         [HttpGet]
         [Route("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> GetTaskAsync(string id)
         {
             var response = await _taskService.ReadTaskAsync(id, GetUserId());
@@ -58,7 +73,13 @@ namespace TaskManagement.API.Controllers
             };
         }
 
+        /// <summary>
+        /// Create a task.
+        /// </summary>        
+        /// <returns>Ok if successful, BadRequest otherwise.</returns>
         [HttpPost]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]       
         public async Task<IActionResult> CreateTaskAsync([FromBody] TaskDTO taskDTO)
         {       
             var response = await _taskService.CreateTaskAsync(taskDTO, GetUserId());
@@ -70,8 +91,17 @@ namespace TaskManagement.API.Controllers
             };
         }
 
+        /// <summary>
+        /// Update a task by ID.
+        /// </summary>
+        /// <param name="id">Task ID.</param>
+        /// <returns>Ok if successful, NotFound if task not found, BadRequest otherwise.</returns>
         [HttpPut]
         [Route("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> UpdateTaskAsync(string id, [FromBody] TaskDTO taskDTO)
         {
             var response = await _taskService.UpdateTaskAsync(id, taskDTO, GetUserId());
@@ -85,8 +115,17 @@ namespace TaskManagement.API.Controllers
             };
         }
 
+        /// <summary>
+        /// Delete a task by ID.
+        /// </summary>
+        /// <param name="id">Task ID.</param>
+        /// <returns>NoContent if successful, NotFound if the task is not found, BadRequest otherwise.</returns>
         [HttpDelete]
         [Route("{id}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(403)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> DeleteTaskAsync(string id)
         {
             var response = await _taskService.DeleteTaskAsync(id, GetUserId());
