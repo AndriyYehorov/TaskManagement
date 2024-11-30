@@ -122,7 +122,7 @@ namespace TaskManagement.API.Controllers
         /// <returns>NoContent if successful, NotFound if the task is not found, BadRequest otherwise.</returns>
         [HttpDelete]
         [Route("{id}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
