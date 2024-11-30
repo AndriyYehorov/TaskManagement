@@ -1,7 +1,4 @@
 # Task Management API
-
-Task Management API is a project for managing tasks with features like user authentication, task creation, and filtering.
-
 ---
 
 ## 🚀 Setup Instructions
