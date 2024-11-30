@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using TaskManagement.Application.DTOs;
 using TaskManagement.Application.Repositories;
 using TaskManagement.Application.Services;
@@ -9,10 +10,11 @@ namespace TaskManagement.Infrastructure.Services
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
-
-        public TaskService(ITaskRepository taskRepository)
+        private readonly ILogger<TaskService> _logger;
+        public TaskService(ITaskRepository taskRepository, ILogger<TaskService> logger)
         {
             _taskRepository = taskRepository;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<TaskItem>> CreateTaskAsync(TaskDTO taskDTO, string userId)
@@ -31,6 +33,8 @@ namespace TaskManagement.Infrastructure.Services
             };
 
             await _taskRepository.AddTaskAsync(newTask);
+
+            _logger.LogInformation("Task was created successfully. TaskId: {TaskId}.", newTask.Id);
 
             return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task was created successfully", Data: newTask);
         }
@@ -54,7 +58,9 @@ namespace TaskManagement.Infrastructure.Services
                 return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "You can`t delete other people's tasks");
             }
 
-            await _taskRepository.DeleteTaskAsync(taskToDelete);            
+            await _taskRepository.DeleteTaskAsync(taskToDelete);
+
+            _logger.LogInformation("Task was deleted successfully. TaskId: {TaskId}.", taskToDelete.Id);
 
             return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task was deleted successfully");  
         }
@@ -132,6 +138,8 @@ namespace TaskManagement.Infrastructure.Services
             taskToUpdate.UpdatedAt = DateTime.UtcNow;
 
             await _taskRepository.UpdateTaskAsync(taskToUpdate);
+
+            _logger.LogInformation("Task was updated successfully. TaskId: {TaskId}.", taskToUpdate.Id);
 
             return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task updated successfully", Data: taskToUpdate);            
         }

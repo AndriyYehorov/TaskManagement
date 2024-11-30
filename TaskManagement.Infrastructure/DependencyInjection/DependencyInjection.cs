@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskManagement.Application.Repositories;
@@ -51,11 +52,19 @@ namespace TaskManagement.Infrastructure.DependencyInjection
                 };
             });
 
+            services.AddLogging(options =>
+            {
+                options.AddConsole(c =>
+                {                    
+                    c.TimestampFormat = "[HH:mm:ss] ";
+                });
+            });
+
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITaskRepository, TaskRepository>();
 
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ITaskService, TaskService>();
+            services.AddScoped<ITaskService, TaskService>();            
 
             return services;
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -15,11 +16,13 @@ namespace TaskManagement.Infrastructure.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly JwtOptions _options;
+        private readonly ILogger<UserService> _logger;
 
-        public UserService(IUserRepository userRepository, IOptions<JwtOptions> options)
+        public UserService(IUserRepository userRepository, IOptions<JwtOptions> options, ILogger<UserService> logger)
         {
-            _userRepository = userRepository;
+            _userRepository = userRepository;           
             _options = options.Value;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<string>> LoginUserAsync(LoginDTO loginDTO)
@@ -61,7 +64,9 @@ namespace TaskManagement.Infrastructure.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _userRepository.AddUserAsync(newUser);
+            await _userRepository.AddUserAsync(newUser);            
+
+            _logger.LogInformation("User was created successfully. UserId: {UserId}.", newUser.Id);
 
             return new ServiceResponse<User>(IsSuccess: true, Message: "User was created successfully", Data: newUser);
         }
