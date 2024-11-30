@@ -1,14 +1,15 @@
 ﻿using TaskManagement.Application.DTOs;
+using TaskManagement.Domain.Entities;
 
 namespace TaskManagement.Application.Services
 {
     public interface ITaskService
     {
-        Task<TaskResponse> CreateTaskAsync(TaskDTO taskDTO, string userId);     
+        Task<ServiceResponse<TaskItem>> CreateTaskAsync(TaskDTO taskDTO, string userId);     
 
-        Task<TaskResponse> ReadTaskAsync(string id, string userId);
+        Task<ServiceResponse<TaskItem>> ReadTaskAsync(string id, string userId);
 
-        Task<TasksResponse> ReadAllTasksAsync(
+        Task<ServiceResponse<IEnumerable<TaskItem>>> ReadAllTasksAsync(
             TaskFilter? filter,
             string? sortColumn, 
             string? sortOrder, 
@@ -16,8 +17,8 @@ namespace TaskManagement.Application.Services
             int pageSize, 
             string userId);
 
-        Task<TaskResponse> UpdateTaskAsync(string id, TaskDTO taskDTO, string userId);
+        Task<ServiceResponse<TaskItem>> UpdateTaskAsync(string id, TaskDTO taskDTO, string userId);
 
-        Task<TaskResponse> DeleteTaskAsync(string id, string userId);        
+        Task<ServiceResponse<TaskItem>> DeleteTaskAsync(string id, string userId);        
     }
 }

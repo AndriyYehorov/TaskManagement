@@ -22,24 +22,24 @@ namespace TaskManagement.Infrastructure.Services
             _options = options.Value;
         }
 
-        public async Task<LoginResponse> LoginUserAsync(LoginDTO loginDTO)
+        public async Task<ServiceResponse<string>> LoginUserAsync(LoginDTO loginDTO)
         {
             var existingUser = await _userRepository.GetUserByUsernameOrEmailAsync(loginDTO.UsernameOrEmail);           
 
             if (existingUser == null)
             {
-                return new LoginResponse(IsSuccess: false, Message: "User with this Username/Email doesn`t exist");
+                return new ServiceResponse<string>(IsSuccess: false, Message: "User with this Username/Email doesn`t exist");
             }
 
             if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, existingUser.PasswordHash))
             {
-                return new LoginResponse(IsSuccess: false, Message: "Wrong password");
+                return new ServiceResponse<string>(IsSuccess: false, Message: "Wrong password");
             }
            
-            return new LoginResponse(IsSuccess: true, Message: "You logged in successfully", Token: GenerateJWT(existingUser));
+            return new ServiceResponse<string>(IsSuccess: true, Message: "You logged in successfully", Data: GenerateJWT(existingUser));
         }
 
-        public async Task<UserResponse> RegisterUserAsync(UserDTO userDTO)
+        public async Task<ServiceResponse<User>> RegisterUserAsync(UserDTO userDTO)
         {
             var existingUserByUsername = await _userRepository.GetUserByUsernameAsync(userDTO.Username);
 
@@ -48,7 +48,7 @@ namespace TaskManagement.Infrastructure.Services
             if (existingUserByUsername != null || 
                 existingUserByEmail != null)
             {
-                return new UserResponse(IsSuccess: false, Message: "User with the same username or email already exists");
+                return new ServiceResponse<User>(IsSuccess: false, Message: "User with the same username or email already exists");
             }
 
             var newUser = new User()
@@ -63,7 +63,7 @@ namespace TaskManagement.Infrastructure.Services
 
             await _userRepository.AddUserAsync(newUser);
 
-            return new UserResponse(IsSuccess: true, Message: "User was created successfully", User: newUser);
+            return new ServiceResponse<User>(IsSuccess: true, Message: "User was created successfully", Data: newUser);
         }
 
         private string GenerateJWT(User user)

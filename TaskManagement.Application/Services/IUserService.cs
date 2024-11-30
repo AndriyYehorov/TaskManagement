@@ -1,11 +1,12 @@
 ﻿using TaskManagement.Application.DTOs;
+using TaskManagement.Domain.Entities;
 
 namespace TaskManagement.Application.Services
 {
     public interface IUserService
     {
-        Task<UserResponse> RegisterUserAsync(UserDTO userDTO);
+        Task<ServiceResponse<User>> RegisterUserAsync(UserDTO userDTO);
 
-        Task<LoginResponse> LoginUserAsync(LoginDTO loginDTO);
+        Task<ServiceResponse<string>> LoginUserAsync(LoginDTO loginDTO);
     }
 }

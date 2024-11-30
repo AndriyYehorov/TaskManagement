@@ -15,7 +15,7 @@ namespace TaskManagement.Infrastructure.Services
             _taskRepository = taskRepository;
         }
 
-        public async Task<TaskResponse> CreateTaskAsync(TaskDTO taskDTO, string userId)
+        public async Task<ServiceResponse<TaskItem>> CreateTaskAsync(TaskDTO taskDTO, string userId)
         {
             var newTask = new TaskItem()
             {
@@ -32,36 +32,34 @@ namespace TaskManagement.Infrastructure.Services
 
             await _taskRepository.AddTaskAsync(newTask);
 
-            return new TaskResponse(IsSuccess: true, Message: "Task was created successfully", Task: newTask);
+            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task was created successfully", Data: newTask);
         }
 
-        public async Task<TaskResponse> DeleteTaskAsync(string id, string userId)
+        public async Task<ServiceResponse<TaskItem>> DeleteTaskAsync(string id, string userId)
         {
-            try
+            if (!Guid.TryParse(id, out var taskGuid))
             {
-                var taskToDelete = await _taskRepository.GetTaskAsync(new Guid(id));
-
-                if (taskToDelete == null)
-                {
-                    return new TaskResponse(IsSuccess: false, Message: "Task was not found");
-                }
-
-                if (taskToDelete.UserId != new Guid(userId))
-                {
-                    return new TaskResponse(IsSuccess: false, Message: "You can`t delete other people's tasks");
-                }
-
-                await _taskRepository.DeleteTaskAsync(taskToDelete);
-
-                return new TaskResponse(IsSuccess: true, Message: "Task was deleted successfully");
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Wrong id format");
             }
-            catch (FormatException)
+
+            var taskToDelete = await _taskRepository.GetTaskAsync(taskGuid);
+
+            if (taskToDelete == null)
             {
-                return new TaskResponse(IsSuccess: false, Message: "Wrong id format");
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Task was not found");
             }
+
+            if (taskToDelete.UserId != new Guid(userId))
+            {
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "You can`t delete other people's tasks");
+            }
+
+            await _taskRepository.DeleteTaskAsync(taskToDelete);            
+
+            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task was deleted successfully");  
         }
 
-        public async Task<TasksResponse> ReadAllTasksAsync(
+        public async Task<ServiceResponse<IEnumerable<TaskItem>>> ReadAllTasksAsync(
             TaskFilter? filter,
             string? sortColumn,
             string? sortOrder, 
@@ -79,67 +77,63 @@ namespace TaskManagement.Infrastructure.Services
 
             if (!tasks.Any())
             {
-                return new TasksResponse(IsSuccess: false, Message: "No tasks were found");
+                return new ServiceResponse<IEnumerable<TaskItem>>(IsSuccess: false, Message: "No tasks were found");
             }
 
-            return new TasksResponse(IsSuccess: true, Message: $"{tasks.Count()} task(s)", Tasks: tasks);
+            return new ServiceResponse<IEnumerable<TaskItem>>(IsSuccess: true, Message: $"{tasks.Count()} task(s)", Data: tasks);
         }
 
-        public async Task<TaskResponse> ReadTaskAsync(string id, string userId)
+        public async Task<ServiceResponse<TaskItem>> ReadTaskAsync(string id, string userId)
         {
-            try
+            if (!Guid.TryParse(id, out var taskGuid))
             {
-                var task = await _taskRepository.GetTaskAsync(new Guid(id));
-
-                if (task == null)
-                {
-                    return new TaskResponse(IsSuccess: false, Message: "Task was not found");
-                }
-
-                if (task.UserId != new Guid(userId))
-                {
-                    return new TaskResponse(IsSuccess: false, Message: "You can`t read other people's tasks");
-                }
-
-                return new TaskResponse(IsSuccess: true, Message: "Here`s your task", Task: task);
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Wrong id format");
             }
-            catch(FormatException)
+
+            var task = await _taskRepository.GetTaskAsync(taskGuid);
+
+            if (task == null)
             {
-                return new TaskResponse(IsSuccess: false, Message: "Wrong id format");
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Task was not found");
             }
+
+            if (task.UserId != new Guid(userId))
+            {
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "You can`t read other people's tasks");
+            }
+
+            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Here`s your task", Data: task);            
         }
 
-        public async Task<TaskResponse> UpdateTaskAsync(string id, TaskDTO taskDTO, string userId)
+        public async Task<ServiceResponse<TaskItem>> UpdateTaskAsync(string id, TaskDTO taskDTO, string userId)
         {
-            try
+            if (!Guid.TryParse(id, out var taskGuid))
             {
-                var taskToUpdate = await _taskRepository.GetTaskAsync(new Guid(id));
-
-                if (taskToUpdate == null)
-                {
-                    return new TaskResponse(IsSuccess: false, Message: "Task was not found");
-                }
-
-                if (taskToUpdate.UserId != new Guid(userId))
-                {
-                    return new TaskResponse(IsSuccess: false, Message: "You can`t edit other people's tasks");
-                }
-
-                taskToUpdate.Title = taskDTO.Title;
-                taskToUpdate.Description = taskDTO.Description;
-                taskToUpdate.DueDate = taskDTO.DueDate;
-                taskToUpdate.Status = taskDTO.Status;
-                taskToUpdate.Priority = taskDTO.Priority;
-                taskToUpdate.UpdatedAt = DateTime.UtcNow;
-
-                await _taskRepository.UpdateTaskAsync(taskToUpdate);
-
-                return new TaskResponse(IsSuccess: true, Message: "Task updated successfully", Task: taskToUpdate);
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Wrong id format");
             }
-            catch (FormatException)
+
+            var taskToUpdate = await _taskRepository.GetTaskAsync(taskGuid);
+
+            if (taskToUpdate == null)
             {
-                return new TaskResponse(IsSuccess: false, Message: "Wrong id format");
+                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Task was not found");
             }
+
+            if (taskToUpdate.UserId != new Guid(userId))
+            {
+                return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "You can`t edit other people's tasks");
+            }
+
+            taskToUpdate.Title = taskDTO.Title;
+            taskToUpdate.Description = taskDTO.Description;
+            taskToUpdate.DueDate = taskDTO.DueDate;
+            taskToUpdate.Status = taskDTO.Status;
+            taskToUpdate.Priority = taskDTO.Priority;
+            taskToUpdate.UpdatedAt = DateTime.UtcNow;
+
+            await _taskRepository.UpdateTaskAsync(taskToUpdate);
+
+            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task updated successfully", Data: taskToUpdate);            
         }
     }
 }

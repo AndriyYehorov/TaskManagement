@@ -29,7 +29,7 @@ namespace TaskManagement.API.Controllers
 
             if (response.IsSuccess)
             {
-                HttpContext.Response.Cookies.Append(_options.CookieName, response.Token);
+                HttpContext.Response.Cookies.Append(_options.CookieName, response.Data);
                 return Ok(response);
             }
 

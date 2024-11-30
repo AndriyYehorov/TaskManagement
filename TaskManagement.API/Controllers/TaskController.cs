@@ -37,8 +37,8 @@ namespace TaskManagement.API.Controllers
                 GetUserId());
 
             if (!response.IsSuccess)
-            {                
-                return NoContent();
+            {
+                return BadRequest(response);
             }
 
             return Ok(response);
@@ -52,7 +52,7 @@ namespace TaskManagement.API.Controllers
 
             if (!response.IsSuccess)
             {
-                return NotFound(response);
+                return BadRequest(response);
             }
 
             return Ok(response);
@@ -91,7 +91,7 @@ namespace TaskManagement.API.Controllers
                 return BadRequest(response);
             }
 
-            return Ok(response);
+            return NoContent();
         }
 
         private string GetUserId()
