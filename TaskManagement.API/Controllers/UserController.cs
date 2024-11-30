@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TaskManagement.Application.DTOs;
-using TaskManagement.Application.Repositories;
+using TaskManagement.Application.Enums;
 using TaskManagement.Application.Services;
 using TaskManagement.Infrastructure.Authentication;
 
@@ -27,10 +26,15 @@ namespace TaskManagement.API.Controllers
         { 
             var response = await _userService.LoginUserAsync(loginDTO);
 
-            if (response.IsSuccess)
+            if (response.Result == ServiceResult.Success)
             {
                 HttpContext.Response.Cookies.Append(_options.CookieName, response.Data);
                 return Ok(response);
+            }
+
+            if (response.Result == ServiceResult.NotFound)
+            {
+                return NotFound(response);
             }
 
             return BadRequest(response);
@@ -42,7 +46,7 @@ namespace TaskManagement.API.Controllers
         {
             var response = await _userService.RegisterUserAsync(userDTO);
 
-            if (response.IsSuccess)
+            if (response.Result == ServiceResult.Success)
             {
                 return Ok(response);
             }

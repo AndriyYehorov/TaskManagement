@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TaskManagement.Application.DTOs;
+using TaskManagement.Application.Enums;
 using TaskManagement.Application.Repositories;
 using TaskManagement.Application.Services;
 using TaskManagement.Domain.Entities;
@@ -31,15 +32,15 @@ namespace TaskManagement.Infrastructure.Services
 
             if (existingUser == null)
             {
-                return new ServiceResponse<string>(IsSuccess: false, Message: "User with this Username/Email doesn`t exist");
+                return new ServiceResponse<string>(Result: ServiceResult.NotFound, Message: "User with this Username/Email doesn`t exist");
             }
 
             if (!BCrypt.Net.BCrypt.Verify(loginDTO.Password, existingUser.PasswordHash))
             {
-                return new ServiceResponse<string>(IsSuccess: false, Message: "Wrong password");
+                return new ServiceResponse<string>(Result: ServiceResult.Error, Message: "Wrong password");
             }
            
-            return new ServiceResponse<string>(IsSuccess: true, Message: "You logged in successfully", Data: GenerateJWT(existingUser));
+            return new ServiceResponse<string>(Result: ServiceResult.Success, Message: "You logged in successfully", Data: GenerateJWT(existingUser));
         }
 
         public async Task<ServiceResponse<User>> RegisterUserAsync(UserDTO userDTO)
@@ -51,7 +52,7 @@ namespace TaskManagement.Infrastructure.Services
             if (existingUserByUsername != null || 
                 existingUserByEmail != null)
             {
-                return new ServiceResponse<User>(IsSuccess: false, Message: "User with the same username or email already exists");
+                return new ServiceResponse<User>(Result: ServiceResult.Error, Message: "User with the same username or email already exists");
             }
 
             var newUser = new User()
@@ -68,7 +69,7 @@ namespace TaskManagement.Infrastructure.Services
 
             _logger.LogInformation("User was created successfully. UserId: {UserId}.", newUser.Id);
 
-            return new ServiceResponse<User>(IsSuccess: true, Message: "User was created successfully", Data: newUser);
+            return new ServiceResponse<User>(Result: ServiceResult.Success, Message: "User was created successfully", Data: newUser);
         }
 
         private string GenerateJWT(User user)

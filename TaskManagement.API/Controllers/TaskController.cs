@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using TaskManagement.Application.DTOs;
+using TaskManagement.Application.Enums;
 using TaskManagement.Application.Services;
-using TaskManagement.Infrastructure.Authentication;
 
 namespace TaskManagement.API.Controllers
 {
@@ -36,12 +35,12 @@ namespace TaskManagement.API.Controllers
                 pageSize, 
                 GetUserId());
 
-            if (!response.IsSuccess)
+            return response.Result switch
             {
-                return BadRequest(response);
-            }
-
-            return Ok(response);
+                ServiceResult.Success => Ok(response),
+                ServiceResult.NotFound => NotFound(response),
+                _ => BadRequest(response),
+            };
         }
 
         [HttpGet]
@@ -50,12 +49,13 @@ namespace TaskManagement.API.Controllers
         {
             var response = await _taskService.ReadTaskAsync(id, GetUserId());
 
-            if (!response.IsSuccess)
+            return response.Result switch
             {
-                return BadRequest(response);
-            }
-
-            return Ok(response);
+                ServiceResult.Success => Ok(response),
+                ServiceResult.NotFound => NotFound(response),
+                ServiceResult.Forbidden => Forbid(),
+                _ => BadRequest(response),
+            };
         }
 
         [HttpPost]
@@ -63,7 +63,11 @@ namespace TaskManagement.API.Controllers
         {       
             var response = await _taskService.CreateTaskAsync(taskDTO, GetUserId());
 
-            return Ok(response);
+            return response.Result switch
+            {
+                ServiceResult.Success => Ok(response),                
+                _ => BadRequest(response),
+            };
         }
 
         [HttpPut]
@@ -72,12 +76,13 @@ namespace TaskManagement.API.Controllers
         {
             var response = await _taskService.UpdateTaskAsync(id, taskDTO, GetUserId());
 
-            if (!response.IsSuccess) 
-            { 
-                return BadRequest(response);
-            }
-
-            return Ok(response);
+            return response.Result switch
+            {
+                ServiceResult.Success => Ok(response),
+                ServiceResult.NotFound => NotFound(response),
+                ServiceResult.Forbidden => Forbid(),
+                _ => BadRequest(response),
+            };
         }
 
         [HttpDelete]
@@ -86,12 +91,13 @@ namespace TaskManagement.API.Controllers
         {
             var response = await _taskService.DeleteTaskAsync(id, GetUserId());
 
-            if (!response.IsSuccess)
+            return response.Result switch
             {
-                return BadRequest(response);
-            }
-
-            return NoContent();
+                ServiceResult.Success => NoContent(),
+                ServiceResult.NotFound => NotFound(response),
+                ServiceResult.Forbidden => Forbid(),
+                _ => BadRequest(response),
+            };
         }
 
         private string GetUserId()

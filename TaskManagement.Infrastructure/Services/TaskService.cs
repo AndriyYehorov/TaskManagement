@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using TaskManagement.Application.DTOs;
+using TaskManagement.Application.Enums;
 using TaskManagement.Application.Repositories;
 using TaskManagement.Application.Services;
 using TaskManagement.Domain.Entities;
@@ -11,6 +12,7 @@ namespace TaskManagement.Infrastructure.Services
     {
         private readonly ITaskRepository _taskRepository;
         private readonly ILogger<TaskService> _logger;
+
         public TaskService(ITaskRepository taskRepository, ILogger<TaskService> logger)
         {
             _taskRepository = taskRepository;
@@ -36,33 +38,33 @@ namespace TaskManagement.Infrastructure.Services
 
             _logger.LogInformation("Task was created successfully. TaskId: {TaskId}.", newTask.Id);
 
-            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task was created successfully", Data: newTask);
+            return new ServiceResponse<TaskItem>(Result: ServiceResult.Success, Message: "Task was created successfully", Data: newTask);
         }
 
         public async Task<ServiceResponse<TaskItem>> DeleteTaskAsync(string id, string userId)
         {
             if (!Guid.TryParse(id, out var taskGuid))
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Wrong id format");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.Error, Message: "Wrong id format");
             }
 
             var taskToDelete = await _taskRepository.GetTaskAsync(taskGuid);
 
             if (taskToDelete == null)
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Task was not found");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.NotFound, Message: "Task was not found");
             }
 
             if (taskToDelete.UserId != new Guid(userId))
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "You can`t delete other people's tasks");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.Forbidden, Message: "You can`t delete other people's tasks");
             }
 
             await _taskRepository.DeleteTaskAsync(taskToDelete);
 
             _logger.LogInformation("Task was deleted successfully. TaskId: {TaskId}.", taskToDelete.Id);
 
-            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task was deleted successfully");  
+            return new ServiceResponse<TaskItem>(Result: ServiceResult.Success, Message: "Task was deleted successfully");  
         }
 
         public async Task<ServiceResponse<IEnumerable<TaskItem>>> ReadAllTasksAsync(
@@ -83,51 +85,51 @@ namespace TaskManagement.Infrastructure.Services
 
             if (!tasks.Any())
             {
-                return new ServiceResponse<IEnumerable<TaskItem>>(IsSuccess: false, Message: "No tasks were found");
+                return new ServiceResponse<IEnumerable<TaskItem>>(Result: ServiceResult.NotFound, Message: "No tasks were found");
             }
 
-            return new ServiceResponse<IEnumerable<TaskItem>>(IsSuccess: true, Message: $"{tasks.Count()} task(s)", Data: tasks);
+            return new ServiceResponse<IEnumerable<TaskItem>>(Result: ServiceResult.Success, Message: $"{tasks.Count()} task(s)", Data: tasks);
         }
 
         public async Task<ServiceResponse<TaskItem>> ReadTaskAsync(string id, string userId)
         {
             if (!Guid.TryParse(id, out var taskGuid))
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Wrong id format");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.Error, Message: "Wrong id format");
             }
 
             var task = await _taskRepository.GetTaskAsync(taskGuid);
 
             if (task == null)
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Task was not found");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.NotFound, Message: "Task was not found");
             }
 
             if (task.UserId != new Guid(userId))
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "You can`t read other people's tasks");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.Forbidden, Message: "You can`t read other people's tasks");
             }
 
-            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Here`s your task", Data: task);            
+            return new ServiceResponse<TaskItem>(Result: ServiceResult.Success, Message: "Here`s your task", Data: task);            
         }
 
         public async Task<ServiceResponse<TaskItem>> UpdateTaskAsync(string id, TaskDTO taskDTO, string userId)
         {
             if (!Guid.TryParse(id, out var taskGuid))
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Wrong id format");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.Error, Message: "Wrong id format");
             }
 
             var taskToUpdate = await _taskRepository.GetTaskAsync(taskGuid);
 
             if (taskToUpdate == null)
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: false, Message: "Task was not found");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.NotFound, Message: "Task was not found");
             }
 
             if (taskToUpdate.UserId != new Guid(userId))
             {
-                return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "You can`t edit other people's tasks");
+                return new ServiceResponse<TaskItem>(Result: ServiceResult.Forbidden, Message: "You can`t edit other people's tasks");
             }
 
             taskToUpdate.Title = taskDTO.Title;
@@ -141,7 +143,7 @@ namespace TaskManagement.Infrastructure.Services
 
             _logger.LogInformation("Task was updated successfully. TaskId: {TaskId}.", taskToUpdate.Id);
 
-            return new ServiceResponse<TaskItem>(IsSuccess: true, Message: "Task updated successfully", Data: taskToUpdate);            
+            return new ServiceResponse<TaskItem>(Result: ServiceResult.Success, Message: "Task updated successfully", Data: taskToUpdate);            
         }
     }
 }
