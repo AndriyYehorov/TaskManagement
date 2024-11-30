@@ -19,7 +19,7 @@ namespace TaskManagement.Infrastructure.DependencyInjection
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<ApplicationContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("Default"),
+                options.UseSqlServer(configuration.GetConnectionString("DefaultDb"),
                 b => b.MigrationsAssembly(typeof(DependencyInjection).Assembly.FullName)));
 
             services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
